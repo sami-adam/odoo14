@@ -1,0 +1,35 @@
+#version: '2'
+services:
+  db:
+    image: postgres:12  # PostgreSQL 12 is recommended for Odoo 14
+    user: root
+    environment:
+      - POSTGRES_USER=odoo
+      - POSTGRES_PASSWORD=odoo14@2023  # Updated password for Odoo 14
+      - POSTGRES_DB=postgres
+    restart: always
+    volumes:
+      - ./postgresql:/var/lib/postgresql/data
+
+  odoo14:
+    image: odoo:14  # Updated to Odoo 14
+    user: root
+    depends_on:
+      - db
+    ports:
+      - "10014:8069"  # Changed port for Odoo 14
+      - "20014:8072"  # Live chat port updated
+    tty: true
+    environment:
+      - HOST=db
+      - USER=odoo
+      - PASSWORD=odoo14@2023  # Updated password for Odoo 14
+    volumes:
+      # Uncomment the following lines if you need to sync system time and install additional packages
+      # - /etc/timezone:/etc/timezone:ro
+      # - /etc/localtime:/etc/localtime:ro
+      # - ./entrypoint.sh:/entrypoint.sh
+      - ./addons:/mnt/extra-addons
+      - ./etc:/etc/odoo
+    restart: always
+
